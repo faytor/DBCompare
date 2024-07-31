@@ -60,63 +60,53 @@ def fetch_table_schema(conn, table):
 # Database Comparison Function
 # ==============================
 def compare_databases(db1_path, db2_path):
-    """
-    Compare two SQLite databases and return their differences.
+    # Create connections to both databases
+    conn1 = sqlite3.connect(db1_path)
+    conn2 = sqlite3.connect(db2_path)
 
-    Args:
-        db1_path (str): Path to the first database file.
-        db2_path (str): Path to the second database file.
+    # Create cursors for both databases
+    cursor1 = conn1.cursor()
+    cursor2 = conn2.cursor()
 
-    Returns:
-        dict: A dictionary containing the comparison results:
-            - 'only_in_db1': Set of tables only in the first database.
-            - 'only_in_db2': Set of tables only in the second database.
-            - 'differences': List of dictionaries containing differences in common tables.
-            - 'error': String describing any error that occurred (if applicable).
-    """
-    try:
-        # Connect to databases
-        conn1 = sqlite3.connect(db1_path)
-        conn2 = sqlite3.connect(db2_path)
-        
-        # Get table lists
-        tables1 = set(get_tables(conn1))
-        tables2 = set(get_tables(conn2))
-        
-        # Compare table lists
-        only_in_db1 = tables1 - tables2
-        only_in_db2 = tables2 - tables1
-        common_tables = tables1.intersection(tables2)
-        
-        differences = []
-        
-        # Compare common tables
-        for table in common_tables:
-            schema1 = fetch_table_schema(conn1, table)
-            schema2 = fetch_table_schema(conn2, table)
-            
-            data1 = fetch_table_data(conn1, table)
-            data2 = fetch_table_data(conn2, table)
-            
-            if schema1 != schema2 or data1 != data2:
+    # Get the list of tables in both databases
+    cursor1.execute("SELECT name FROM sqlite_master WHERE type='table'")
+    tables1 = [row[0] for row in cursor1.fetchall()]
+
+    cursor2.execute("SELECT name FROM sqlite_master WHERE type='table'")
+    tables2 = [row[0] for row in cursor2.fetchall()]
+
+    # Create dictionaries to store the data for each table
+    data1_dict = {}
+    data2_dict = {}
+
+    # Iterate over the tables and store the data in dictionaries
+    for table in set(tables1) | set(tables2):
+        if table in tables1 and table in tables2:
+            # Compare the data in the table
+            cursor1.execute(f"SELECT * FROM {table}")
+            data1 = cursor1.fetchall()
+
+            cursor2.execute(f"SELECT * FROM {table}")
+            data2 = cursor2.fetchall()
+
+            if data1 != data2:
                 differences.append({
                     'table': table,
-                    'schema1': schema1,
-                    'schema2': schema2,
                     'data1': data1,
                     'data2': data2
                 })
-        
-        # Close database connections
-        conn1.close()
-        conn2.close()
-        
-        return {
-            'only_in_db1': only_in_db1,
-            'only_in_db2': only_in_db2,
-            'differences': differences
-        }
-        
-    except sqlite3.Error as e:
-        return {'error': str(e)}
+        elif table in tables1:
+            only_in_db1.append(table)
+        else:
+            only_in_db2.append(table)
+
+    # Close the connections
+    conn1.close()
+    conn2.close()
+
+    return {
+        'differences': differences,
+        'only_in_db1': only_in_db1,
+        'only_in_db2': only_in_db2
+    }
 
