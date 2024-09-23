@@ -28,3 +28,7 @@ A lightweight application for comparing two SQLite databases, helping developers
 1. Run the application:
    ```bash
    python main.py
+
+
+
+**Keywords**: SQLite, Database Comparison, Open Source, Data Analysis, GUI Tool, Python Application, Tkinter, Database Merge, Code Merging, Data Visualization, Software Development, Version Control, Database Management.
