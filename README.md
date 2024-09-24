@@ -5,11 +5,9 @@
 
 A lightweight application for comparing two SQLite databases, helping developers identify differences in structure and content efficiently.
 
-
 <div align="center">
   <img src="img/main_gui.png" alt="GUI Screenshot">
 </div>
-
 <div align="center">
   <img src="img/compare_gui.png" alt="GUI Screenshot">
 </div>
@@ -34,4 +32,4 @@ A lightweight application for comparing two SQLite databases, helping developers
 
 
 
-**Keywords**: SQLite, Database Comparison, Open Source, Data Analysis, GUI Tool, Python Application, Tkinter, Database Merge, Code Merging, Data Visualization, Software Development, Version Control, Database Management.
+**Keywords**: SQLite, Database Comparison, Open Source, Data Analysis, GUI Tool, Tkinter, Database Merge, Data Visualization, Database Management.
