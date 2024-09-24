@@ -7,9 +7,12 @@ A lightweight application for comparing two SQLite databases, helping developers
 
 
 <div align="center">
-  <img src="img/gui_screenshot.png" alt="GUI Screenshot">
+  <img src="img/main_gui.png" alt="GUI Screenshot">
 </div>
 
+<div align="center">
+  <img src="img/compare_gui.png" alt="GUI Screenshot">
+</div>
 
 ## Features
 
