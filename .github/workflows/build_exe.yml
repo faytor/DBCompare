@@ -37,6 +37,14 @@ jobs:
       run: |
         Compress-Archive -Path dist\dbcompare.exe -DestinationPath dbcompare.zip
     
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: dbcompare-app
+        path: |
+          dist\dbcompare.exe
+          dbcompare.zip
+
     - name: Create Release
       uses: softprops/action-gh-release@v1
       with:
