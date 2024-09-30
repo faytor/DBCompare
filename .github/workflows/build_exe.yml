@@ -28,16 +28,7 @@ jobs:
     
     - name: Build executable
       run: |
-        pyinstaller --onefile --windowed --add-data "img/icon.png;img" --icon="icon.ico" main.py || exit 1  # Ensure this line exits on failure
-    
-    - name: Check if executable was created
-      run: |
-        if (Test-Path dist\dbcompare.exe) {
-          Write-Host "Executable found."
-        } else {
-          Write-Host "Executable not found!"
-          exit 1  # Fail the job if executable is not found
-        }
+        pyinstaller --onefile --windowed --add-data "img/icon.png;img" --icon="icon.ico" main.py
     
     - name: List dist directory  # Check if the executable is created
       run: dir dist  # For Windows, this will list files in the dist directory
@@ -46,14 +37,6 @@ jobs:
       run: |
         Compress-Archive -Path dist\dbcompare.exe -DestinationPath dbcompare.zip
     
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: dbcompare-app
-        path: |
-          dist\dbcompare.exe
-          dbcompare.zip
-
     - name: Create Release
       uses: softprops/action-gh-release@v1
       with:
