@@ -27,16 +27,20 @@ jobs:
         python -c "from PIL import Image; img = Image.open('img/icon.png'); img.save('icon.ico')"
     
     - name: Build executable
-      run: pyinstaller --name=dbcompare --onefile --windowed --add-data "img/icon.png;img" --icon="icon.ico" main.py
+      run: |
+        pyinstaller --name=dbcompare --onefile --windowed --add-data "img/icon.png;img" --icon="icon.ico" main.py
+    
+    - name: List dist directory  # Check if the executable is created
+      run: dir dist  # For Windows, this will list files in the dist directory
     
     - name: Create ZIP file
       run: |
         Compress-Archive -Path dist\dbcompare.exe -DestinationPath dbcompare.zip
     
-    - name: Upload artifact
+    - name: Upload artifacts
       uses: actions/upload-artifact@v3
       with:
         name: dbcompare-app
         path: |
-          dist/dbcompare.exe
+          dist\dbcompare.exe
           dbcompare.zip
