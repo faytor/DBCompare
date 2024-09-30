@@ -28,7 +28,16 @@ jobs:
     
     - name: Build executable
       run: |
-        pyinstaller --onefile --windowed --add-data "img/icon.png;img" --icon="icon.ico" main.py
+        pyinstaller --onefile --windowed --add-data "img/icon.png;img" --icon="icon.ico" main.py || exit 1  # Ensure this line exits on failure
+    
+    - name: Check if executable was created
+      run: |
+        if (Test-Path dist\dbcompare.exe) {
+          Write-Host "Executable found."
+        } else {
+          Write-Host "Executable not found!"
+          exit 1  # Fail the job if executable is not found
+        }
     
     - name: List dist directory  # Check if the executable is created
       run: dir dist  # For Windows, this will list files in the dist directory
