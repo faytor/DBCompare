@@ -16,13 +16,17 @@ jobs:
       with:
         python-version: '3.x'
     
-    - name: Install PyInstaller
+    - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install pyinstaller
+        pip install pyinstaller pillow
+    
+    - name: Convert PNG to ICO
+      run: |
+        python -c "from PIL import Image; img = Image.open('img/icon.png'); img.save('icon.ico')"
     
     - name: Build executable
-      run: pyinstaller --name=dbcompare --onefile --windowed --add-data "img/icon.png;." --icon="img/icon.png" main.py
+      run: pyinstaller --name=dbcompare --onefile --windowed --add-data "img/icon.png;img" --icon="icon.ico" main.py
     
     - name: Upload artifact
       uses: actions/upload-artifact@v3
