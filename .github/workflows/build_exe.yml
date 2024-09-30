@@ -28,7 +28,7 @@ jobs:
     
     - name: Build executable
       run: |
-        pyinstaller --name=dbcompare --onefile --windowed --add-data "img/icon.png;img" --icon="icon.ico" main.py
+        pyinstaller --onefile --windowed --add-data "img/icon.png;img" --icon="icon.ico" main.py
     
     - name: List dist directory  # Check if the executable is created
       run: dir dist  # For Windows, this will list files in the dist directory
@@ -37,10 +37,14 @@ jobs:
       run: |
         Compress-Archive -Path dist\dbcompare.exe -DestinationPath dbcompare.zip
     
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v3
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
       with:
-        name: dbcompare-app
-        path: |
+        tag_name: ${{ github.ref }}  # Use the tag that triggered this workflow
+        files: |
           dist\dbcompare.exe
           dbcompare.zip
+        name: Release ${{ github.ref_name }}
+        body: This is a new release of DBCompare.
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
