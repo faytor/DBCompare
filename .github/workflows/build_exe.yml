@@ -1,50 +1,44 @@
-name: Build DBCompare Executable
+name: Create Release
 
 on:
   push:
-    tags:
-      - 'v*'  # This will trigger the workflow for any tag starting with 'v'
+    branches:
+      - develop
 
 jobs:
   build:
     runs-on: windows-latest
-    
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v2
     
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v2
       with:
         python-version: '3.x'
     
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install pyinstaller pillow
-    
-    - name: Convert PNG to ICO
-      run: |
-        python -c "from PIL import Image; img = Image.open('img/icon.png'); img.save('icon.ico')"
+    - name: Install PyInstaller
+      run: pip install pyinstaller
     
     - name: Build executable
-      run: |
-        pyinstaller --onefile --windowed --add-data "img/icon.png;img" --icon="icon.ico" main.py
-    
-    - name: List dist directory  # Check if the executable is created
-      run: dir dist  # For Windows, this will list files in the dist directory
-    
-    - name: Create ZIP file
-      run: |
-        Compress-Archive -Path dist\dbcompare.exe -DestinationPath dbcompare.zip
+      run: pyinstaller --onefile --windowed main.py
     
     - name: Create Release
-      uses: softprops/action-gh-release@v1
-      with:
-        tag_name: ${{ github.ref }}  # Use the tag that triggered this workflow
-        files: |
-          dist\dbcompare.exe
-          dbcompare.zip
-        name: Release ${{ github.ref_name }}
-        body: This is a new release of DBCompare.
+      id: create_release
+      uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ github.run_number }}
+        release_name: Release v${{ github.run_number }}
+        draft: false
+        prerelease: false
+    
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dist/main.exe
+        asset_name: main.exe
+        asset_content_type: application/octet-stream
