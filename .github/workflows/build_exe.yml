@@ -1,0 +1,58 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - 'v*' # This will trigger the workflow on any tag starting with 'v'
+    branches:
+      - develop
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+    
+    - name: Install PyInstaller and Pillow
+      run: |
+        pip install pyinstaller
+        pip install pillow
+    
+    - name: Convert PNG to ICO
+      run: |
+        python -c "from PIL import Image; img = Image.open('img/icon.png'); img.save('icon.ico')"
+    
+    - name: Build executable
+      run: pyinstaller --onefile --windowed --icon=icon.ico --name=DBCompare main.py
+    
+    - name: Create Release
+      if: startsWith(github.ref, 'refs/tags/')
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref_name }}
+        draft: false
+        prerelease: false
+    
+    - name: Upload Release Asset
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dist/DBCompare.exe
+        asset_name: DBCompare.exe
+        asset_content_type: application/octet-stream
