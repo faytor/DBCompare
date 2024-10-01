@@ -6,7 +6,7 @@ on:
       - 'v*' # This will trigger the workflow on any tag starting with 'v'
     branches:
       - develop
-      - main
+      - master
 
 permissions:
   contents: write
